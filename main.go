@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"pizza-order/module/auth/transport/gin"
+	ginauth "pizza-order/module/auth/transport/gin"
 	"pizza-order/module/user/model"
 )
 
@@ -33,11 +33,23 @@ func main() {
 
 	r := gin.Default()
 
+	r.Static("/public", "./public")
+	r.Static("/favicon.ico", "./public/favicon.ico")
+	r.LoadHTMLGlob("views/**/*")
+
+	r.GET("/login", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "login.html", gin.H{})
+	})
+	r.GET("/register", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "register.html", gin.H{})
+	})
+
 	v1 := r.Group("/v1")
 	{
 		items := v1.Group("/auth")
 		{
 			items.POST("/register", ginauth.Register(db))
+			items.POST("/login", ginauth.Login(db))
 		}
 	}
 

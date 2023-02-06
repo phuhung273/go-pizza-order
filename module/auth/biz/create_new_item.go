@@ -2,13 +2,13 @@ package biz
 
 import (
 	"context"
-	"pizza-order/module/auth/model"
+	"pizza-order/module/user/model"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type CreateItemStorage interface {
-	CreateItem(ctx context.Context, data *model.RegisterRequest) error
+	CreateItem(ctx context.Context, data *model.User) error
 }
 
 type createItemBiz struct {
@@ -19,7 +19,7 @@ func NewCreateItemBiz(store CreateItemStorage) *createItemBiz {
 	return &createItemBiz{store: store}
 }
 
-func (biz *createItemBiz) CreateNewItem(ctx context.Context, data *model.RegisterRequest) error {
+func (biz *createItemBiz) CreateNewItem(ctx context.Context, data *model.User) error {
 	if err := data.Validate(); err != nil {
 		return err
 	}
