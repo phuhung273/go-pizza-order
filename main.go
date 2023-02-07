@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -59,7 +60,7 @@ func main() {
 		})
 	})
 
-	if err := r.Run(); err != nil {
+	if err := r.Run(fmt.Sprintf(":%s", os.Getenv("SERVICE_PORT"))); err != nil {
 		log.Fatalln(err)
 	}
 }
