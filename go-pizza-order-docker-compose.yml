@@ -1,0 +1,35 @@
+version: "3.3"
+services:
+  mysqldb:
+    image: mysql:8
+    container_name: mysqldb-container
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_TCP_PORT=${DB_PORT}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./init-sql-scripts.sql:/docker-entrypoint-initdb.d/init-sql-scripts.sql
+    networks:
+      - go-pizza-order-net
+  go-pizza-order-services:
+    build:
+      context: ./
+      dockerfile: DockerFile
+      args:
+        DB_PORT_FOR_DOCKER_FILE: ${DB_PORT}
+    container_name: go-pizza-order-service-container
+    depends_on:
+      - mysqldb
+    environment:
+      - DB_CONN=${CONNECTION_STRING_DB}
+      - GIN_MODE=${SERVICE_MODE}
+      - SERVICE_PORT=${SERVICE_PORT}
+    ports:
+      - "${SERVICE_PORT}:${SERVICE_PORT}"
+    networks:
+      - go-pizza-order-net
+networks:
+  go-pizza-order-net:
+    driver: bridge

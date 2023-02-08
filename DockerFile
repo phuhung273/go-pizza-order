@@ -1,0 +1,14 @@
+FROM golang:1.19-alpine
+ARG DB_PORT_FOR_DOCKER_FILE
+ENV DB_PORT=$DB_PORT_FOR_DOCKER_FILE
+RUN mkdir /root/pizza-order
+#Don't use ./* to copy, it's only copy file not directory and it will cause not found package at GOROOT when exec go build
+COPY ./ /root/pizza-order
+WORKDIR /root/pizza-order
+RUN go mod download
+RUN go build -o ./app
+RUN chmod +x ./wait-for-it.sh
+#For exec bash file
+RUN apk update && apk add bash
+ENTRYPOINT ./wait-for-it.sh mysqldb:${DB_PORT} --timeout=100 -- ./app
+
