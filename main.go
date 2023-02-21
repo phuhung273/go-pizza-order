@@ -13,8 +13,9 @@ import (
 	"github.com/joho/godotenv"
 
 	ginauth "pizza-order/module/auth/transport/gin"
+	modelProduct "pizza-order/module/product/model"
 	ginproduct "pizza-order/module/product/transport/gin"
-	"pizza-order/module/user/model"
+	modelUser "pizza-order/module/user/model"
 )
 
 func main() {
@@ -31,7 +32,7 @@ func main() {
 	log.Println("DB Connection:", db)
 
 	// Auto Migrate
-	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&modelUser.User{}, &modelProduct.Product{})
 
 	r := gin.Default()
 
