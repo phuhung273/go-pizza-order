@@ -13,6 +13,7 @@ import (
 	"github.com/joho/godotenv"
 
 	ginauth "pizza-order/module/auth/transport/gin"
+	ginproduct "pizza-order/module/product/transport/gin"
 	"pizza-order/module/user/model"
 )
 
@@ -51,6 +52,11 @@ func main() {
 		{
 			items.POST("/register", ginauth.Register(db))
 			items.POST("/login", ginauth.Login(db))
+		}
+
+		products := v1.Group("/products")
+		{
+			products.POST("/", ginproduct.CreateItem(db))
 		}
 	}
 
