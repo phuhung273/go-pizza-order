@@ -12,7 +12,7 @@ import (
 
 func CreateItem(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
-		var requestData model.Product
+		var requestData model.ProductCreation
 
 		if err := c.ShouldBind(&requestData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -40,6 +40,8 @@ func CreateItem(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		c.String(http.StatusOK, "register done")
+		c.JSON(http.StatusOK, gin.H{
+			"message": "done",
+		})
 	}
 }

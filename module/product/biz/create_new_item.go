@@ -6,7 +6,7 @@ import (
 )
 
 type CreateItemStorage interface {
-	CreateItem(ctx context.Context, data *model.Product) error
+	CreateItem(ctx context.Context, data *model.ProductCreation) error
 }
 
 type createItemBiz struct {
@@ -17,7 +17,7 @@ func NewCreateItemBiz(store CreateItemStorage) *createItemBiz {
 	return &createItemBiz{store: store}
 }
 
-func (biz *createItemBiz) CreateNewItem(ctx context.Context, data *model.Product) error {
+func (biz *createItemBiz) CreateNewItem(ctx context.Context, data *model.ProductCreation) error {
 	if err := data.Validate(); err != nil {
 		return err
 	}

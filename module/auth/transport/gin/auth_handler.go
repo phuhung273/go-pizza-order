@@ -91,6 +91,8 @@ func Login(db *gorm.DB) func(ctx *gin.Context) {
 			})
 		}
 
+		// TODO: Set cookie
+
 		c.String(http.StatusOK, "login done")
 	}
 }

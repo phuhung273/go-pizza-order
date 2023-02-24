@@ -8,19 +8,29 @@ import (
 )
 
 var (
-	ErrNameCannotBeEmpty  = errors.New("Name cannot be empty")
-	ErrImageCannotBeEmpty = errors.New("Image cannot be empty")
-	ErrPriceCannotBeEmpty = errors.New("Price cannot be empty")
+	ErrNameCannotBeEmpty  = errors.New("name cannot be empty")
+	ErrImageCannotBeEmpty = errors.New("image cannot be empty")
+	ErrPriceCannotBeEmpty = errors.New("price cannot be empty")
+)
+
+const (
+	EntityName = "Product"
 )
 
 type Product struct {
 	gorm.Model
-	Name  string `gorm:"size:50"`
-	Image string `gorm:"size:200"`
-	Price int32
+	Name  string `gorm:"size:50" form:"name"`
+	Image string `gorm:"size:200" form:"image"`
+	Price int32  `form:"price"`
 }
 
-func (i *Product) Validate() error {
+type ProductCreation struct {
+	Name  string `form:"name"`
+	Image string `form:"image"`
+	Price int32  `form:"price"`
+}
+
+func (i *ProductCreation) Validate() error {
 	i.Name = strings.TrimSpace(i.Name)
 	i.Image = strings.TrimSpace(i.Image)
 
