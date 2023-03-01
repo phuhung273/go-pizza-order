@@ -13,7 +13,10 @@ import (
 	"github.com/joho/godotenv"
 
 	ginauth "pizza-order/module/auth/transport/gin"
-	"pizza-order/module/user/model"
+	ginhome "pizza-order/module/home/transport/gin"
+	modelProduct "pizza-order/module/product/model"
+	ginproduct "pizza-order/module/product/transport/gin"
+	modelUser "pizza-order/module/user/model"
 )
 
 func main() {
@@ -30,7 +33,7 @@ func main() {
 	log.Println("DB Connection:", db)
 
 	// Auto Migrate
-	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&modelUser.User{}, &modelProduct.Product{})
 
 	r := gin.Default()
 
@@ -45,12 +48,19 @@ func main() {
 		ctx.HTML(http.StatusOK, "register.html", gin.H{})
 	})
 
+	r.GET("/", ginhome.Index(db))
+
 	v1 := r.Group("/v1")
 	{
 		items := v1.Group("/auth")
 		{
 			items.POST("/register", ginauth.Register(db))
 			items.POST("/login", ginauth.Login(db))
+		}
+
+		products := v1.Group("/product")
+		{
+			products.POST("/", ginproduct.CreateItem(db))
 		}
 	}
 
