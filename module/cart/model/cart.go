@@ -14,11 +14,12 @@ const (
 
 type Cart struct {
 	Items []*CartItem
+	Quantity int
 }
 
 type CartItem struct {
-	ID int32 `json:"id"`
-	Quantity int32
+	ID int `json:"id"`
+	Quantity int
 }
 
 func (i *CartItem) Validate() error {

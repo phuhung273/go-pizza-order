@@ -41,8 +41,20 @@ func CreateItem() func(ctx *gin.Context) {
 			return
 		}
 
+		getBusiness := biz.GetItemStorage(store)
+
+		data, err := getBusiness.GetItem(c.Request.Context());
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": "done",
+			"totalQty": data.Quantity,
 		})
 	}
 }

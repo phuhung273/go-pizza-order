@@ -7,8 +7,9 @@ function updateCart(id) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id }),
   })
+    .then((res) => res.json())
     .then((res) => {
-      cartCounter.innerText = res.data.totalQty;
+      cartCounter.innerText = res.totalQty;
       new Noty({
         type: "success",
         timeout: 1000,
@@ -17,6 +18,7 @@ function updateCart(id) {
       }).show();
     })
     .catch((err) => {
+      console.log(err);
       new Noty({
         type: "error",
         timeout: 1000,

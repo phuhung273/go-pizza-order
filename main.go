@@ -42,7 +42,7 @@ func main() {
 	
 	r := gin.Default()
 
-	gob.Register(&modelCart.Cart{})
+	gob.Register(modelCart.Cart{})
 
 	store := cookie.NewStore([]byte("secret"))
   	r.Use(sessions.Sessions("mysession", store))
