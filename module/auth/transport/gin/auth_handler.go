@@ -8,6 +8,8 @@ import (
 	userModel "pizza-order/module/user/model"
 	"pizza-order/module/user/storage"
 
+	"github.com/gin-contrib/sessions"
+
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -91,7 +93,10 @@ func Login(db *gorm.DB) func(ctx *gin.Context) {
 			})
 		}
 
-		// TODO: Set cookie
+		session := sessions.Default(c)
+
+		session.Set("user_id", user.ID);
+		session.Save();
 
 		c.String(http.StatusOK, "login done")
 	}

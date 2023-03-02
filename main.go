@@ -1,19 +1,24 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-
 	ginauth "pizza-order/module/auth/transport/gin"
+	modelCart "pizza-order/module/cart/model"
+	gincart "pizza-order/module/cart/transport/gin"
 	ginhome "pizza-order/module/home/transport/gin"
+	modelOrder "pizza-order/module/order/model"
 	modelProduct "pizza-order/module/product/model"
 	ginproduct "pizza-order/module/product/transport/gin"
 	modelUser "pizza-order/module/user/model"
@@ -33,9 +38,14 @@ func main() {
 	log.Println("DB Connection:", db)
 
 	// Auto Migrate
-	db.AutoMigrate(&modelUser.User{}, &modelProduct.Product{})
-
+	db.AutoMigrate(&modelUser.User{}, &modelProduct.Product{}, &modelOrder.Order{})
+	
 	r := gin.Default()
+
+	gob.Register(&modelCart.Cart{})
+
+	store := cookie.NewStore([]byte("secret"))
+  	r.Use(sessions.Sessions("mysession", store))
 
 	r.Static("/public", "./public")
 	r.Static("/favicon.ico", "./public/favicon.ico")
@@ -61,6 +71,11 @@ func main() {
 		products := v1.Group("/product")
 		{
 			products.POST("/", ginproduct.CreateItem(db))
+		}
+
+		carts := v1.Group("/cart")
+		{
+			carts.POST("/", gincart.CreateItem())
 		}
 	}
 

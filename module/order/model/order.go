@@ -4,6 +4,8 @@ import (
 	"errors"
 	"strings"
 
+	"pizza-order/module/product/model"
+
 	"gorm.io/gorm"
 )
 
@@ -34,7 +36,8 @@ type Order struct {
 	UserID  int32
 	Address string `gorm:"size:200" form:"address"`
 	Status string `gorm:"size:20; default:PENDING"`
-	// TODO: user, products relation
+	// TODO: user
+	Products []model.Product `gorm:"many2many:order_products;"`
 }
 
 type OrderCreation struct {
