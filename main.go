@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -49,6 +50,12 @@ func main() {
 
 	r.Static("/public", "./public")
 	r.Static("/favicon.ico", "./public/favicon.ico")
+
+	r.SetFuncMap(template.FuncMap{
+        "mul": func (a int, b int) int {
+			return a * b;
+		},
+    })
 	r.LoadHTMLGlob("views/**/*")
 
 	r.GET("/login", func(ctx *gin.Context) {
@@ -75,9 +82,11 @@ func main() {
 
 		carts := v1.Group("/cart")
 		{
-			carts.POST("/", gincart.CreateItem())
+			carts.POST("/", gincart.CreateItem(db))
 		}
 	}
+
+	r.GET("/cart", gincart.Index())
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
