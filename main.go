@@ -1,19 +1,27 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-
+	modelAuth "pizza-order/module/auth/model"
 	ginauth "pizza-order/module/auth/transport/gin"
+	modelCart "pizza-order/module/cart/model"
+	gincart "pizza-order/module/cart/transport/gin"
 	ginhome "pizza-order/module/home/transport/gin"
+	modelOrder "pizza-order/module/order/model"
+	ginorder "pizza-order/module/order/transport/gin"
 	modelProduct "pizza-order/module/product/model"
 	ginproduct "pizza-order/module/product/transport/gin"
 	modelUser "pizza-order/module/user/model"
@@ -33,12 +41,24 @@ func main() {
 	log.Println("DB Connection:", db)
 
 	// Auto Migrate
-	db.AutoMigrate(&modelUser.User{}, &modelProduct.Product{})
-
+	db.AutoMigrate(&modelUser.User{}, &modelProduct.Product{}, &modelOrder.Order{}, &modelOrder.OrderProduct{})
+	
 	r := gin.Default()
+
+	gob.Register(modelCart.Cart{})
+	gob.Register(modelAuth.AuthSession{})
+
+	store := cookie.NewStore([]byte("secret"))
+  	r.Use(sessions.Sessions("mysession", store))
 
 	r.Static("/public", "./public")
 	r.Static("/favicon.ico", "./public/favicon.ico")
+
+	r.SetFuncMap(template.FuncMap{
+        "mul": func (a int, b int) int {
+			return a * b;
+		},
+    })
 	r.LoadHTMLGlob("views/**/*")
 
 	r.GET("/login", func(ctx *gin.Context) {
@@ -62,7 +82,22 @@ func main() {
 		{
 			products.POST("/", ginproduct.CreateItem(db))
 		}
+
+		carts := v1.Group("/cart")
+		{
+			carts.POST("/", gincart.CreateItem(db))
+		}
+
+		orders := v1.Group("/order")
+		{
+			orders.GET("/", ginorder.List(db))
+			orders.POST("/", ginorder.CreateItem(db))
+		}
+
 	}
+	
+	r.GET("/orders", ginorder.Index(db))
+	r.GET("/cart", gincart.Index())
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

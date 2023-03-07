@@ -21,13 +21,13 @@ type Product struct {
 	gorm.Model
 	Name  string `gorm:"size:50" form:"name"`
 	Image string `gorm:"size:200" form:"image"`
-	Price int32  `form:"price"`
+	Price int  `form:"price"`
 }
 
 type ProductCreation struct {
 	Name  string `form:"name"`
 	Image string `form:"image"`
-	Price int32  `form:"price"`
+	Price int  `form:"price"`
 }
 
 func (i *ProductCreation) Validate() error {
