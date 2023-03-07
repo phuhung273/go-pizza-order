@@ -4,7 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	"pizza-order/module/product/model"
+	modelProduct "pizza-order/module/product/model"
+	modelUser "pizza-order/module/user/model"
 
 	"gorm.io/gorm"
 )
@@ -33,16 +34,32 @@ var OrderStatus = struct {
 
 type Order struct {
 	gorm.Model
-	UserID  int32
+	UserID  int
+	User modelUser.User
 	Address string `gorm:"size:200" form:"address"`
 	Status string `gorm:"size:20; default:PENDING"`
-	// TODO: user
-	Products []model.Product `gorm:"many2many:order_products;"`
+	OrderProducts []OrderProduct
+}
+
+type OrderProduct struct {
+	OrderID  uint `gorm:"primaryKey"`
+	ProductID int `gorm:"primaryKey"`
+	Quantity int
+	Price int
+
+	Product modelProduct.Product
 }
 
 type OrderCreation struct {
-	UserID  string `form:"user_id"`
+	UserID  int `form:"user_id"`
 	Address string `form:"address"`
+	Products []OrderProduct
+}
+
+type OrderProductCreation struct {
+	ProductID int
+	Quantity int
+	Price int
 }
 
 func (i *OrderCreation) Validate() error {

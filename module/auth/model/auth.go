@@ -15,6 +15,10 @@ type AuthRequest struct {
 	Password string `form:"password"`
 }
 
+type AuthSession struct {
+	ID int
+}
+
 func (i *AuthRequest) Validate() error {
 	i.Username = strings.TrimSpace(i.Username)
 

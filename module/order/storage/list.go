@@ -11,7 +11,7 @@ func (s *sqlStore) ListItem(
 ) ([]model.Order, error) {
 	var result []model.Order
 
-	if err := s.db.Find(&result).Error; err != nil {
+	if err := s.db.Preload("OrderProducts.Product").Preload("User").Find(&result).Error; err != nil {
 
 		return nil, common.ErrDB(err)
 	}

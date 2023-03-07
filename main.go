@@ -15,11 +15,13 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	modelAuth "pizza-order/module/auth/model"
 	ginauth "pizza-order/module/auth/transport/gin"
 	modelCart "pizza-order/module/cart/model"
 	gincart "pizza-order/module/cart/transport/gin"
 	ginhome "pizza-order/module/home/transport/gin"
 	modelOrder "pizza-order/module/order/model"
+	ginorder "pizza-order/module/order/transport/gin"
 	modelProduct "pizza-order/module/product/model"
 	ginproduct "pizza-order/module/product/transport/gin"
 	modelUser "pizza-order/module/user/model"
@@ -39,11 +41,12 @@ func main() {
 	log.Println("DB Connection:", db)
 
 	// Auto Migrate
-	db.AutoMigrate(&modelUser.User{}, &modelProduct.Product{}, &modelOrder.Order{})
+	db.AutoMigrate(&modelUser.User{}, &modelProduct.Product{}, &modelOrder.Order{}, &modelOrder.OrderProduct{})
 	
 	r := gin.Default()
 
 	gob.Register(modelCart.Cart{})
+	gob.Register(modelAuth.AuthSession{})
 
 	store := cookie.NewStore([]byte("secret"))
   	r.Use(sessions.Sessions("mysession", store))
@@ -84,8 +87,16 @@ func main() {
 		{
 			carts.POST("/", gincart.CreateItem(db))
 		}
-	}
 
+		orders := v1.Group("/order")
+		{
+			orders.GET("/", ginorder.List(db))
+			orders.POST("/", ginorder.CreateItem(db))
+		}
+
+	}
+	
+	r.GET("/orders", ginorder.Index(db))
 	r.GET("/cart", gincart.Index())
 
 	r.GET("/ping", func(c *gin.Context) {

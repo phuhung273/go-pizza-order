@@ -91,13 +91,22 @@ func Login(db *gorm.DB) func(ctx *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
+			return
 		}
 
 		session := sessions.Default(c)
 
-		session.Set("user_id", user.ID);
-		session.Save();
+		session.Set("auth", authModel.AuthSession{
+			ID: int(user.ID),
+		});
 
-		c.String(http.StatusOK, "login done")
+		if err := session.Save(); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.Redirect(http.StatusMovedPermanently, "/")
 	}
 }
